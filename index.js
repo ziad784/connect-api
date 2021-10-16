@@ -130,6 +130,8 @@ app.post("/Messages",(req,res)=>{
 
 app.get("/login",(req,res)=>{
 
+    console.log(req.session.user)
+    console.log(req.session)
     
     
     if(req.session.user){
