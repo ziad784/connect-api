@@ -46,7 +46,7 @@ const db = mysql.createConnection({
 })
 
 
-const server = app.listen("3001",()=>{
+const server = app.listen("8080",()=>{
     console.log("I am listening");
 })
 
