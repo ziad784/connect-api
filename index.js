@@ -38,10 +38,11 @@ app.use(express.static(__dirname))
 
 
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "connect"
+    host: "bfezgqb2ebryyrcyyq5n-mysql.services.clever-cloud.com",
+    user: "uxjcpsp5bqawojih",
+    password: "J4Acs1AERMAfOZPRuiE",
+    database: "bfezgqb2ebryyrcyyq5n",
+    port: 21096
 })
 
 
