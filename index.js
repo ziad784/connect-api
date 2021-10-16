@@ -128,11 +128,6 @@ app.post("/Messages",(req,res)=>{
 
 
 
-app.get('/', function(req, res) {
-
-    res.send("hhh")
-  })
-
 app.get("/login",(req,res)=>{
 
     
