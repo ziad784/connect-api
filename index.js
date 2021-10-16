@@ -190,10 +190,14 @@ app.post("/Exist",(req,res)=>{
 
 app.post("/login",(req,res)=>{
 
-
+console.log("login");
    
     const email = req.body.email;
     const password = req.body.password;
+    
+    console.log("email",email);
+    
+    console.log("pass",password);
    
 
     const query = "SELECT * FROM users WHERE email = ?";
@@ -204,6 +208,7 @@ app.post("/login",(req,res)=>{
         }
 
         if(data.length === 1){
+            console.log("passed query");
 
             const hashed = data[0].password;
             const ispass = bcrypt.compareSync(password,hashed);
