@@ -219,6 +219,7 @@ console.log("login");
                 
                     const session = data[0].session;
                     req.session.user = session;
+                    console.log(req.session.user);
                     req.session.save((err)=>{
                         if(err){
                             console.log(err);
