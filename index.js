@@ -17,7 +17,7 @@ const saltRounds = 10;
 
 
 app.use(cors({
-    origin: ["http://192.168.1.5:3000","http://localhost:3000"],
+    origin: ["https://connect.vercel.app/"],
     methods: ["GET", "POST"],
     credentials: true
 }));
