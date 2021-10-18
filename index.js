@@ -1,3 +1,5 @@
+require("dotenv").config()
+
 const express = require("express");
 const app = express();
 const socket = require("socket.io");
@@ -6,14 +8,16 @@ const mysql = require("mysql");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcrypt");
-const { query } = require("express");
+
+const jwt = require("jsonwebtoken");
+
 const saltRounds = 10;
 
 
 
 
 app.use(cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://192.168.1.5:3000","http://localhost:3000"],
     methods: ["GET", "POST"],
     credentials: true
 }));
@@ -28,9 +32,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
 
-    cookie:{
-     
-    }
+    cookie:{}
     
 }))
 
@@ -40,15 +42,14 @@ app.use(express.static(__dirname))
 
 
 const db = mysql.createConnection({
-    host: "bfezgqb2ebryyrcyyq5n-mysql.services.clever-cloud.com",
-    user: "uxjcpsp5bqawojih",
-    password: "J4Acs1AERMAfOZPRuiE",
-    database: "bfezgqb2ebryyrcyyq5n",
-    port: 21096
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "connect"
 })
 
 
-const server = app.listen("8080",()=>{
+const server = app.listen("3001",()=>{
     console.log("I am listening");
 })
 
@@ -130,39 +131,57 @@ app.post("/Messages",(req,res)=>{
 
 
 
-app.get("/login",(req,res)=>{
 
-    console.log(req.session.user)
-    console.log(req.session)
+app.post("/islogin",(req,res)=>{
+
+    const token = req.body.token;
+
+    jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,user)=>{
+        if(err){
+            res.send(JSON.stringify({islogin:false}))
+        }else{
+            res.send(JSON.stringify({islogin:true,user:user}));
+        }
+
     
+    })
     
-    if(req.session.user){
-        res.send(JSON.stringify({islogin:true}));
-    }else{
-        
-        res.send(JSON.stringify({islogin:false}));
-    }
+   
 })
 
 
 
 
-app.get("/allUsers",(req,res)=>{
-    const session = req.session.user;
+app.post("/allUsers",(req,res)=>{
+    const token = req.body.token;
 
-    const query = "SELECT id,username,img FROM users WHERE NOT session = ?"
-
-    db.query(query,[session],(err,data)=>{
+    jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,user)=>{
         if(err){
-            console.log(err);
-            res.send(err);
-        }
+            return res.sendStatus(401)
+        }else{
+            const username = user.username;
 
-        if(data.length >= 1){
-            res.send(data);
-        }
 
+            const query = "SELECT id,username,img FROM users WHERE NOT username = ?"
+
+            db.query(query,[username],(err,data)=>{
+                if(err){
+                    console.log(err);
+                    res.send(err);
+                }
+
+                if(data.length >= 1){
+                    res.send(data);
+                }
+
+            })
+
+
+
+        }
     })
+
+    
 
 })
 
@@ -194,14 +213,10 @@ app.post("/Exist",(req,res)=>{
 
 app.post("/login",(req,res)=>{
 
-console.log("login");
+
    
     const email = req.body.email;
     const password = req.body.password;
-    
-    console.log("email",email);
-    
-    console.log("pass",password);
    
 
     const query = "SELECT * FROM users WHERE email = ?";
@@ -212,33 +227,31 @@ console.log("login");
         }
 
         if(data.length === 1){
-            console.log("passed query");
 
             const hashed = data[0].password;
             const ispass = bcrypt.compareSync(password,hashed);
 
             if(ispass){
-                
-                    const session = data[0].session;
-                    req.session.user = session;
-                    console.log(req.session.user);
-                    req.session.save((err)=>{
-                        if(err){
-                            console.log(err);
-                        }
+                const username = data[0].username;
+                const user = {username:username}
 
-                        res.send(JSON.stringify({res:"ok",msg:"logined"}));
-                    })
+
+
+                const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET)
+
+                res.send(JSON.stringify({res:"ok",token:accessToken}));
+             
+                
 
 
             }else{
-                res.send(JSON.stringify({res:"bad",msg:"the Password you Entered is Wrong"}));
+                res.send(JSON.stringify({res:"bad",msg:"the Password you Entered is Wrong"})).statusCode(401);
             }
             
 
 
         }else{
-            res.send(JSON.stringify({res:"bad",msg:"the Email you Entered is Wrong"}));
+            res.send(JSON.stringify({res:"bad",msg:"the Email you Entered is Wrong"})).statusCode(401);
         }
 
     })
@@ -248,27 +261,41 @@ console.log("login");
 
 })
 
+app.get("/",(req,res)=>{
+    res.send("Connect")
+})
 
-app.get("/getUser",(req,res)=>{
-    const session = req.session.user;
 
-    const query = "SELECT id,username,img,session FROM users WHERE session = ?"
-
-    db.query(query,[session],(err,data)=>{
+app.post("/getUser",(req,res)=>{
+    const token = req.body.token;
+    jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,user)=>{
         if(err){
-            console.log(err);
-            res.send(err);
-        }
+            return res.sendStatus(401)
+        }else{
+            const username = user.username;
 
-        if(data){
+
+            const query = "SELECT id,username,img,session FROM users WHERE username = ?"
+
+            db.query(query,[username],(err,data)=>{
+                if(err){
+                    console.log(err);
+                    res.send(err);
+                }
+
+                if(data){
+                    
+                    if(data.length === 1){
+                        res.send(data);
+                    }
             
-            if(data.length === 1){
-                res.send(data);
-            }
-       
+                }
+
+            })
         }
 
     })
+    
 
 })
 
@@ -322,16 +349,11 @@ app.post("/signup",(req,res)=>{
                             }
                             
                             if(data){
-
-
-                                    req.session.user = session;
-                                    req.session.save((err)=>{
-                                        if(err){
-                                            console.log(err);
-                                        }
-
-                                        res.send(JSON.stringify({res:"ok",msg:"profile created"}));
-                                    })
+                                    const user = {username:username};
+                                    const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET)
+                                   
+                                    res.send(JSON.stringify({res:"ok",token:accessToken}));
+                                    
 
                             
                             }
