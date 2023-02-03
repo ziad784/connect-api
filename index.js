@@ -13,6 +13,8 @@ const jwt = require("jsonwebtoken");
 
 const saltRounds = 10;
 
+const port = process.env.PORT
+
 
 
 
@@ -50,7 +52,7 @@ const db = mysql.createConnection({
 })
 
 
-const server = app.listen("8080",()=>{
+const server = app.listen(port,()=>{
     console.log("I am listening");
 })
 
