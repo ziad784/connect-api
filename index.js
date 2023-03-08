@@ -19,7 +19,7 @@ const port = process.env.PORT
 
 
 app.use(cors({
-    origin: ["https://connect.vercel.app/","https://connect.vercel.app"],
+    origin: ["https://connect.vercel.app/","https://connect.vercel.app","http://localhost:3000/","http://localhost:3000"],
     methods: ["GET", "POST"],
     credentials: true
 }));
