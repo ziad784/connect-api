@@ -43,13 +43,7 @@ app.use(express.static(__dirname))
 
 
 
-const db = mysql.createConnection({
-    host: "bfezgqb2ebryyrcyyq5n-mysql.services.clever-cloud.com",
-    user: "uxjcpsp5bqawojih",
-    password: "J4Acs1AERMAfOZPRuiE",
-    database: "bfezgqb2ebryyrcyyq5n",
-    port: 21096
-})
+const db = mysql.createConnection('mysql://0lwyp1acihr5yhbouvh1:pscale_pw_MQf9mwaL8zExwcycpm08g9xAjmWCORfOzTs6UQIKNuP@aws-eu-west-2.connect.psdb.cloud/projects?ssl={"rejectUnauthorized":true}')
 
 
 const server = app.listen(port,()=>{
