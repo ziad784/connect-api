@@ -233,7 +233,7 @@ app.post("/login",(req,res)=>{
                 const user = {username:username}
 
 
-
+                    console.log("test env",process.env.ACCESS_TOKEN_SECRET)
                 const accessToken = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET)
 
                 res.send(JSON.stringify({res:"ok",token:accessToken}));
