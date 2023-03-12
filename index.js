@@ -13,30 +13,16 @@ const jwt = require("jsonwebtoken");
 
 const saltRounds = 10;
 
-const port = process.env.PORT
+const port = process.env.PORT || 4001
 
 
 
 
-app.use(cors({
-    origin: ["https://connect.vercel.app/","https://connect.vercel.app","http://localhost:3000/","http://localhost:3000"],
-    methods: ["GET", "POST"],
- 
-}));
+app.use(cors());
 app.use(express.json());
 
 app.use(cookieParser());
 app.use(express.urlencoded({extended:true}));
-
-app.use(session({
-    key: "login",
-    secret: "WuPQz1wqAc1f3MJD4V*zIzQ&2$sb$SFMTk5mRR#Z0JYi&UBjq*",
-    resave: false,
-    saveUninitialized: false,
-
-    cookie:{}
-    
-}))
 
 
 app.use(express.static(__dirname))
@@ -47,13 +33,14 @@ const db = mysql.createConnection('mysql://0lwyp1acihr5yhbouvh1:pscale_pw_MQf9mw
 
 
 const server = app.listen(port,()=>{
-    console.log("I am listening");
+    console.log("I am listening To",port);
 })
 
 
 const io = socket(server,{
     cors:{
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST"],
+        
     }
 });
 
